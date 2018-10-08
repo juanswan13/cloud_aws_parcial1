@@ -21,23 +21,8 @@ function readURL(input) {
     };
     reader.readAsDataURL(input.files[0]);
     uploadFile(input);
-  } else {
-    removeUpload();
-  }
-}
-
-function readURL(input) {
-  if (input.files && input.files[0]) {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      $('.image-upload-wrap').hide();
-      $('.file-upload-image').attr('src', e.target.result);
-      $('.file-upload-content').show();
-      $('.image-title').html(input.files[0].name);
-    };
-    reader.readAsDataURL(input.files[0]);
-    uploadFile(input);
-  } else {
+    setTimeout(function(){buscarRespuesta(input)}, 13000);
+} else {
     removeUpload();
   }
 }
@@ -82,6 +67,31 @@ function uploadFile(input){
     if (err) {
       return alert('There was an error uploading your photo: ', err.message);
     }
-    alert('Successfully uploaded photo.');
   });
+}
+
+function buscarRespuesta(input){
+    AWS.config.region = 'us-west-2'; // Region
+    AWS.config.credentials = new
+    AWS.CognitoIdentityCredentials({
+      IdentityPoolId: 'us-west-2:309212a7-40bc-4dff-83c2-1f509a113fc2',
+    });
+      //Bucket Definition
+    var bucketName = 'parcial-cloud-icesi-luisyswan';
+  var bucket = new AWS.S3({
+        params: {
+            Bucket: bucketName
+        }
+    });
+  bucket.getObject(
+    { Bucket: bucketName, Key: "respuesta.txt" },
+    function (error, data) {
+      if (error != null) {
+        alert("Failed to retrieve an object: " + error);
+      } else {
+        alert(data.Body.toString('ascii'));
+        // do something with data.Body
+      }
+  }
+);
 }
