@@ -31,6 +31,9 @@ def lambda_handler(event, context):
             
         print("Black: ", black)
         print("Total: ", allPixels)
+        crearArchivo()
+        escribirRespuesta(black, allPixels, key)
+        s3.upload_file('/tmp/respuesta.txt',bucket, 'respuesta.txt')
     print("Funciona el trriger")
     return "Hello form lambda"
 
@@ -38,7 +41,7 @@ def color_image_count(pixel):
     isblack = 0
     black = 0
     for i in pixel:
-        if (i<38):
+        if (i<35):
           isblack +=  1
     if (isblack>=2):
         black +=1
@@ -50,4 +53,19 @@ def gray_image_count(pixel):
     if (pixel<=80):
         black +=1
     return black
+    
+def crearArchivo():
+    archivo = open('/tmp/respuesta.txt', 'w')
+    archivo.close()
 
+def escribirRespuesta(black, total,key):
+    archivo = open('/tmp/respuesta.txt', 'a')
+    archivo.write("PixelesNegros:")
+    archivo.write(str(black))
+    archivo.write(';')
+    archivo.write("Total:")
+    archivo.write(str(total))
+    archivo.write(';')
+    archivo.write(key)
+    archivo.close()
+    
