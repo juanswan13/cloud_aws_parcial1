@@ -13,14 +13,41 @@ def lambda_handler(event, context):
         s3.download_file(Bucket=bucket, Key=key, Filename=tmp)
         
         black = 0
-        red = 0
+        allPixels = 0
         img = Image.open(tmp)
         for pixel in img.getdata():
-            if pixel == (0, 0, 0): # if your image is RGB (if RGBA, (0, 0, 0, 255) or so
-             black += 1
+            imageType = 0
+            try:
+                value = int(pixel)
+                imageType = 1
+            except:
+                pass  # not an int.
+            
+            if(imageType==0):
+                black += color_image_count(pixel)
             else:
-                red += 1
-        print('black=' + str(black)+', red='+str(red))
+                black += gray_image_count(pixel)
+            allPixels += 1
+            
+        print("Black: ", black)
+        print("Total: ", allPixels)
     print("Funciona el trriger")
     return "Hello form lambda"
+
+def color_image_count(pixel):
+    isblack = 0
+    black = 0
+    for i in pixel:
+        if (i<38):
+          isblack +=  1
+    if (isblack>=2):
+        black +=1
+    return black
+
+
+def gray_image_count(pixel):
+    black =0
+    if (pixel<=80):
+        black +=1
+    return black
 
